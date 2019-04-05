@@ -3,11 +3,10 @@ const router = express.Router();
 const { Cart } = require("../models/cart");
 const { User } = require("../models/user");
 const { authentication } = require("./middlewares/authenticate");
-const { authorizationByAdmin } = require("./middlewares/authorization");
 
 router.get("/", authentication, (req, res) => {
   const user = req.user;
-  console.log(user);
+  // console.log(user);
   //res.send(user.cart);
   // user.cart = user.cart.forEach(product => {
   // 	return product.populate("product");
@@ -15,6 +14,7 @@ router.get("/", authentication, (req, res) => {
   // user.save().then(user => {
   // 	res.send(user);
   // });
+  //console.log(req.user);
 
   User.findOne(user._id)
     .select("cart")
@@ -26,7 +26,6 @@ router.get("/", authentication, (req, res) => {
 router.get("/:id", authentication, (req, res) => {
   const cartId = req.params.id;
   const cart = req.user.cart;
-  const userId = req.user._id;
 
   cart.forEach(cartItem => {
     if (cartItem._id == cartId) {
@@ -46,13 +45,13 @@ router.post("/", authentication, (req, res) => {
     }
   });
   if (product) {
-    res.send({ statusText: "you allready added to cart" });
+    res.send({ statusText: "you already added to cart" });
   } else {
     user.cart.push(cart);
     user
       .save()
       .then(user => {
-        res.send({ statusText: "Added Sucessfully", cart });
+        res.send({ statusText: "Added Succesfully", cart });
       })
       .catch(err => {
         res.status(403).send({
@@ -68,7 +67,7 @@ router.put("/:id", authentication, (req, res) => {
   const id = req.params.id;
 
   user.cart.forEach(cart => {
-    if (cart._id == id) {
+    if (cart.product == id) {
       cart.quantity = body.quantity;
     }
   });
@@ -106,7 +105,7 @@ router.delete("/:id", authentication, (req, res) => {
     return cart._id != id;
   });
   user.save().then(user => {
-    res.send({ statusText: "succefuuly deleted", cart: user.cart });
+    res.send({ statusText: "successfully deleted", cart: user.cart });
   });
 });
 module.exports = {

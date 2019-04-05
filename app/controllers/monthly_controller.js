@@ -1,40 +1,53 @@
 const express = require("express");
 const router = express.Router();
+const { User } = require("../models/user");
 const { Monthly } = require("../models/monthlycart");
-const { Product } = require("../models/product");
 const { authentication } = require("./middlewares/authenticate");
 
 router.get("/", authentication, (req, res) => {
   const user = req.user;
-  res.send(user.monthlyCart);
+  //console.log(user);
+  User.findOne(user._id)
+    .select("monthlyCart")
+    .populate("monthlyCart.product")
+    .then(monthly => {
+      res.send(monthly);
+    });
 });
+router.get("/:id", authentication, (req, res) => {
+  const monthlyCartId = req.params.id;
+  const monthly = req.user.monthlyCart;
 
+  monthly.forEach(monthlyCartItem => {
+    if (monthlyCartItem._id == monthlyCartId) {
+      res.send(monthlyCartItem);
+    }
+  });
+});
 router.post("/", authentication, (req, res) => {
   const body = req.body;
   const user = req.user;
-  let dum = false;
+  const monthlyCart = new Monthly(body);
 
-  const monthly = new Monthly(body, user._id);
-  user.monthlyCart.map(product => {
-    if (product.product == body.product) {
-      dum = true;
+  let product = false;
+  user.monthlyCart.map(productId => {
+    if (productId.product == body.product) {
+      product = true;
     }
   });
-
-  if (dum) {
-    res.send({ statusText: "already created" });
+  if (product) {
+    res.send({ statusText: "you already added to monthlycart" });
   } else {
-    user.monthlyCart.push(monthly);
+    user.monthlyCart.push(monthlyCart);
     user
       .save()
       .then(user => {
-        res.send({
-          statusText: "added to cart successfully",
-          monthlyCart: user.monthlyCart
-        });
+        res.send({ statusText: "Added Succesfully", monthlyCart });
       })
       .catch(err => {
-        res.send(err);
+        res.status(403).send({
+          statusText: "You are not authorized to access this URL"
+        });
       });
   }
 });
@@ -43,15 +56,17 @@ router.put("/:id", authentication, (req, res) => {
   const user = req.user;
   const body = req.body;
   const id = req.params.id;
+
   user.monthlyCart.forEach(monthlyCart => {
-    if (monthlyCart._id == id) {
+    if (monthlyCart.product == id) {
       monthlyCart.quantity = body.quantity;
     }
   });
+
   user
     .save()
     .then(user => {
-      res.send(user.monthlyCart);
+      res.send(user);
     })
     .catch(err => {
       res.send(err);
@@ -60,23 +75,15 @@ router.put("/:id", authentication, (req, res) => {
 router.delete("/:id", authentication, (req, res) => {
   const user = req.user;
   const id = req.params.id;
-  user.monthlyCart = user.monthlyCart.filter(monthlyCart => {
-    return monthlyCart._id != id;
+  user.monthlyCart = user.monthlyCart.filter(monthlycart => {
+    return monthlycart._id != id;
   });
-
-  //console.log(user.cart);
-  user
-    .save()
-    .then(user => {
-      //  console.log(user.cart);
-      res.send({
-        statusText: "succesfully deleted",
-        monthlyCart: user.monthlyCart
-      });
-    })
-    .catch(err => {
-      res.send(err);
+  user.save().then(user => {
+    res.send({
+      statusText: "successfully deleted",
+      monthlyCart: user.monthlyCart
     });
+  });
 });
 module.exports = {
   monthlyCartController: router
