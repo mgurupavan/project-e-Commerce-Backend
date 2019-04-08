@@ -35,8 +35,8 @@ router.post("/login", (req, res) => {
 });
 router.delete("/logout", authentication, (req, res) => {
   const tokenData = req.token;
-  console.log(1);
-  console.log(req.user);
+  // console.log(1);
+  // console.log(req.user);
   User.findOneAndUpdate(
     { _id: req.user._id },
     { $pull: { tokens: { token: tokenData } } }

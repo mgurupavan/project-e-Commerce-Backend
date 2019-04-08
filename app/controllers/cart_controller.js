@@ -60,14 +60,12 @@ router.post("/", authentication, (req, res) => {
       });
   }
 });
-
 router.put("/:id", authentication, (req, res) => {
   const user = req.user;
   const body = req.body;
   const id = req.params.id;
-
   user.cart.forEach(cart => {
-    if (cart.product == id) {
+    if (cart._id == id) {
       cart.quantity = body.quantity;
     }
   });
@@ -75,29 +73,13 @@ router.put("/:id", authentication, (req, res) => {
   user
     .save()
     .then(user => {
-      res.send(user);
+      res.send({ statusText: "successfully Updated", cart: user.cart });
     })
     .catch(err => {
       res.send(err);
     });
-
-  // user
-  // 	.update(
-  // 		{ _id: id },
-  // 		{
-  // 			$set: { "cart.$.qunatity": body }
-  // 		},
-  // 		{
-  // 			new: true
-  // 		}
-  // 	)
-  // 	.then(cart => {
-  // 		res.send(cart);
-  // 	})
-  // 	.catch(err => {
-  // 		res.send(err);
-  // 	});
 });
+
 router.delete("/:id", authentication, (req, res) => {
   const user = req.user;
   const id = req.params.id;

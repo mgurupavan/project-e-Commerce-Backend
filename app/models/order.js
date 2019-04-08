@@ -9,17 +9,30 @@ const orderSchema = new Schema({
     type: Date,
     default: Date.now
   },
-  orderaNumber: {
-    type: String,
-    required: true
+  orderNumber: {
+    type: String
   },
-  totalOrders: {
-    type: Number,
-    required: true
+  total: {
+    type: Number
   },
-  lineItems: []
+  lineItems: [
+    {
+      product: {
+        type: Schema.Types.ObjectId,
+        ref: "product"
+      },
+      quantity: {
+        type: Number,
+        min: 1
+      },
+      price: {
+        type: Number
+      }
+    }
+  ]
 });
 const Order = mongoose.model("Order", orderSchema);
 module.exports = {
-  Order
+  Order,
+  orderSchema
 };
