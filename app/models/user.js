@@ -54,7 +54,11 @@ userSchema = new Schema({
   cart: [cartSchema],
   monthlyCart: [monthlyCartSchema],
   address: [addressSchema],
-  orderHistory: [orderSchema]
+  orderHistory: [orderSchema],
+  review: {
+    type: Schema.Types.ObjectId,
+    ref: "Review"
+  }
 });
 
 userSchema.pre("validate", function(next) {

@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const validator = require("validator");
+const { reviewSchema } = require("./review");
 const { Schema } = mongoose;
 const productSchema = new Schema({
   name: {
@@ -38,7 +38,8 @@ const productSchema = new Schema({
   imageUrl: {
     type: String,
     required: true
-  }
+  },
+  review: [reviewSchema]
 });
 const Product = mongoose.model("Product", productSchema);
 module.exports = {
