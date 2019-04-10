@@ -10,7 +10,7 @@ const monthlyCartSchema = new Schema({
     type: Number,
     min: 1,
     max: 50
-    //	required: true
+    //	required:true
   }
 });
 const Monthly = mongoose.model("Monthly", monthlyCartSchema);
