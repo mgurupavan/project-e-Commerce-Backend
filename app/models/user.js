@@ -70,7 +70,7 @@ userSchema.pre("validate", function(next) {
           return next(err);
         }
         count = data;
-        //console.log(count);
+        //console.log(count)
       })
       .then(() => {
         if (count == 0) {
