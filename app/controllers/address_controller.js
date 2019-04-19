@@ -21,7 +21,7 @@ router.get("/", authentication, (req, res) => {
 router.get("/:id", authentication, (req, res) => {
   const addressId = req.params.id;
   const address = req.user.address;
-  console.log(req.user);
+  // console.log(req.user);
   address.forEach(addressItem => {
     if (addressItem._id == addressId) {
       res.send(addressItem);
