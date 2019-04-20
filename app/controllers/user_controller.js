@@ -1,7 +1,6 @@
 const express = require("express");
 const router = express.Router();
 const { authentication } = require("./middlewares/authenticate");
-const { authorizationByAdmin } = require("./middlewares/authorization");
 const { User } = require("../models/user");
 
 router.post("/register", (req, res) => {
@@ -35,44 +34,34 @@ router.post("/login", (req, res) => {
 });
 router.delete("/logout", authentication, (req, res) => {
   const tokenData = req.token;
-  // console.log(1);
-  // console.log(req.user);
   User.findOneAndUpdate(
     { _id: req.user._id },
     { $pull: { tokens: { token: tokenData } } }
   )
     .then(user => {
       user.save().then(user => {
-        res.send("suceessfully logout");
+        res.send({ statusText: "suceessfully logout" });
       });
     })
     .catch(err => {
       res.send(err);
     });
 });
-router.delete("/logoutall", (req, res) => {
+router.delete("/logoutall", authentication, (req, res) => {
   let token = req.token;
-  User.findOneAndUpdate(
-    { _id: req.user._id },
-    //{ $pull: { tokens: { token: token } } },
-    { $set: { tokens: [] } }
-  )
+  User.findOneAndUpdate({ _id: req.user._id }, { $set: { tokens: [] } })
     .then(user => {
-      // 	for (let i = 0; i < user.tokens.length; i++) {
-      // 		if (token == user.tokens[i].token) {
-      // 			user.tokens.splice(0);
-      // 		}
-      // 	}
       user.save().then(user => {
-        res.send("suceessfully logout from all devices");
+        res.send({ statusText: "suceessfully logout from all devices" });
       });
     })
     .catch(err => {
       res.send(err);
     });
 });
-router.get("/", (req, res) => {
-  User.find()
+router.get("/:id", (req, res) => {
+  const id = req.params.id;
+  User.findOne({ _id: id })
     .then(user => {
       res.send(user);
     })

@@ -4,7 +4,6 @@ const multer = require("multer");
 const router = express.Router();
 const path = require("path");
 const { Product } = require("../models/product");
-const { authorizationByAdmin } = require("./middlewares/authorization");
 const { authentication } = require("../controllers/middlewares/authenticate");
 const { Category } = require("../models/category");
 var storage = multer.diskStorage({
@@ -39,18 +38,18 @@ router.get("/", (req, res) => {
     .populate("category") // give all category filds
     .then(products => {
       res.send(products);
-    })
-    // Product.find()
-    // 	.then(product => {
-    // 		if (product.length != 0) {
-    // 			res.send(product);
-    // 		} else {
-    // 			res.send([]);
-    // 		}
-    // 	})
-    .catch(err => {
-      res.send(err);
     });
+  // Product.find()
+  // 	.then(product => {
+  // 		if (product.length != 0) {
+  // 			res.send(product);
+  // 		} else {
+  // 			res.send([]);
+  // 		}
+  // 	})
+  // 	.catch(err => {
+  // 		res.send(err);
+  // 	});
 });
 router.get("/:id", (req, res) => {
   Product.findById(req.params.id)
@@ -73,18 +72,22 @@ router.get("/:id", (req, res) => {
       res.send(err);
     });
 });
-router.post("/", upload.single("imageUrl"), (req, res) => {
+router.post("/", authentication, upload.single("imageUrl"), (req, res) => {
   const dest = req.file.destination;
   const imagePath = "http://localhost:3001" + dest.slice(1) + req.file.filename;
-  const product = new Product({
-    name: req.body.name,
-    description: req.body.description,
-    price: req.body.price,
-    stock: req.body.stock,
-    isCod: req.body.isCod,
-    category: req.body.category,
-    imageUrl: imagePath
-  });
+  const user = req.user;
+  const product = new Product(
+    {
+      name: req.body.name,
+      description: req.body.description,
+      price: req.body.price,
+      stock: req.body.stock,
+      isCod: req.body.isCod,
+      category: req.body.category,
+      imageUrl: imagePath
+    },
+    { _id: user._id }
+  );
 
   product
     .save()
@@ -92,17 +95,29 @@ router.post("/", upload.single("imageUrl"), (req, res) => {
       res.send(product);
     })
     .catch(err => {
-      res.send(err);
+      res.status(500).send({ statusText: "internal server error" });
     });
 });
 
-router.put("/:id", (req, res) => {
+router.put("/:id", authentication, upload.single("imageUrl"), (req, res) => {
+  const image = req.file.imageUrl;
+
+  const user = req.user;
   Product.findOneAndUpdate(
+    // { userId: user._id },
     {
       _id: req.params.id
     },
     {
-      $set: req.body
+      $set: {
+        name: req.body.name,
+        description: req.body.description,
+        price: req.body.price,
+        stock: req.body.stock,
+        isCod: req.body.isCod,
+        category: req.body.category,
+        image
+      }
     },
     {
       new: true
@@ -112,16 +127,17 @@ router.put("/:id", (req, res) => {
       res.send(product);
     })
     .catch(err => {
-      res.send(err);
+      res.status(500).send({ statusText: "internal server error" });
     });
 });
-router.delete("/:id", (req, res) => {
-  Product.findOneAndDelete({ _id: req.params.id })
+router.delete("/:id", authentication, (req, res) => {
+  const user = req.user;
+  Product.findOneAndDelete({ _id: req.params.id }, user._id)
     .then(product => {
       res.send(product);
     })
     .catch(err => {
-      res.send(err);
+      res.status(500).send({ statusText: "internal server error" });
     });
 });
 

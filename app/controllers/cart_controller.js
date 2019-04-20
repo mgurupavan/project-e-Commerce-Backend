@@ -6,16 +6,6 @@ const { authentication } = require("./middlewares/authenticate");
 
 router.get("/", authentication, (req, res) => {
   const user = req.user;
-  // console.log(user);
-  //res.send(user.cart);
-  // user.cart = user.cart.forEach(product => {
-  // 	return product.populate("product");
-  // });
-  // user.save().then(user => {
-  // 	res.send(user);
-  // });
-  //console.log(req.user);
-
   User.findOne(user._id)
     .select("cart")
     .populate("cart.product")
@@ -26,7 +16,6 @@ router.get("/", authentication, (req, res) => {
 router.get("/:id", authentication, (req, res) => {
   const cartId = req.params.id;
   const cart = req.user.cart;
-
   cart.forEach(cartItem => {
     if (cartItem._id == cartId) {
       res.send(cartItem);
@@ -36,8 +25,7 @@ router.get("/:id", authentication, (req, res) => {
 router.post("/", authentication, (req, res) => {
   const body = req.body;
   const user = req.user;
-  const cart = new Cart(body);
-
+  const cart = new Cart(body, user._id);
   let product = false;
   user.cart.map(productId => {
     if (productId.product == body.product) {
@@ -45,13 +33,13 @@ router.post("/", authentication, (req, res) => {
     }
   });
   if (product) {
-    res.send({ statusText: "you already added to cart" });
+    res.send({ statusText: "you allready added to cart" });
   } else {
     user.cart.push(cart);
     user
       .save()
       .then(user => {
-        res.send({ statusText: "Added Succesfully", cart });
+        res.send({ statusText: "Added Sucessfully" });
       })
       .catch(err => {
         res.status(403).send({
@@ -60,6 +48,7 @@ router.post("/", authentication, (req, res) => {
       });
   }
 });
+
 router.put("/:id", authentication, (req, res) => {
   const user = req.user;
   const body = req.body;
@@ -73,13 +62,12 @@ router.put("/:id", authentication, (req, res) => {
   user
     .save()
     .then(user => {
-      res.send({ statusText: "successfully Updated", cart: user.cart });
+      res.send({ statusText: "succesfully Updated" });
     })
     .catch(err => {
       res.send(err);
     });
 });
-
 router.delete("/:id", authentication, (req, res) => {
   const user = req.user;
   const id = req.params.id;
@@ -87,7 +75,7 @@ router.delete("/:id", authentication, (req, res) => {
     return cart._id != id;
   });
   user.save().then(user => {
-    res.send({ statusText: "successfully deleted", cart: user.cart });
+    res.send({ statusText: "succesfully deleted" });
   });
 });
 module.exports = {

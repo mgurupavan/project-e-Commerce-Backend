@@ -4,13 +4,13 @@ const monthlyCartSchema = new Schema({
   product: {
     type: Schema.Types.ObjectId,
     ref: "Product"
-    //required:true
+    // required: true
   },
   quantity: {
     type: Number,
     min: 1,
     max: 50
-    //	required:true
+    // required: true
   }
 });
 const Monthly = mongoose.model("Monthly", monthlyCartSchema);
