@@ -22,7 +22,7 @@ router.post("/login", (req, res) => {
     .then(user => {
       //instance method
       return user.generateByToken();
-      //res.send(" successfully logedin ");
+      //res.send(" successfully logedin");
     })
     .then(token => {
       //res.header("x-auth", token).send();
