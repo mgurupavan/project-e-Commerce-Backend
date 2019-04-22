@@ -22,7 +22,7 @@ router.post("/login", (req, res) => {
     .then(user => {
       //instance method
       return user.generateByToken();
-      //res.send(" successfully logedin");
+      //res.send(" successfully logedin ");
     })
     .then(token => {
       //res.header("x-auth", token).send();
@@ -59,9 +59,10 @@ router.delete("/logoutall", authentication, (req, res) => {
       res.send(err);
     });
 });
-router.get("/:id", (req, res) => {
+router.get("/", (req, res) => {
   const id = req.params.id;
-  User.findOne({ _id: id })
+  User.find()
+    .select("order")
     .then(user => {
       res.send(user);
     })
