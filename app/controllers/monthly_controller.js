@@ -1,7 +1,6 @@
 const express = require("express");
 const router = express.Router();
 const { Monthly } = require("../models/monthlycart");
-const { Product } = require("../models/product");
 const { User } = require("../models/user");
 const { authentication } = require("./middlewares/authenticate");
 

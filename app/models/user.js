@@ -54,36 +54,11 @@ userSchema = new Schema({
   cart: [cartSchema],
   monthlyCart: [monthlyCartSchema],
   address: [addressSchema],
-  orderHistory: [orderSchema],
   review: {
     type: Schema.Types.ObjectId,
     ref: "Review"
-  }
-});
-
-userSchema.pre("validate", function(next) {
-  let count;
-  if (this.isNew) {
-    this.constructor
-      .countDocuments(function(err, data) {
-        if (err) {
-          return next(err);
-        }
-        count = data;
-        //console.log(count)
-      })
-      .then(() => {
-        if (count == 0) {
-          this.role[0] = "admin";
-          next();
-        } else {
-          this.role[0] = "user";
-          next();
-        }
-      });
-  } else {
-    next();
-  }
+  },
+  order: [orderSchema]
 });
 //generate password encrprition hide the original password
 userSchema.pre("save", function(next) {
@@ -127,7 +102,8 @@ userSchema.statics.findByCredentials = function(email, password) {
 userSchema.methods.generateByToken = function() {
   user = this; //reffering the user object in side User model
   const userid = {
-    user_id: user._id
+    user_id: user._id,
+    user_role: user.role
   };
 
   const token = jwt.sign(userid, "9849084994");
@@ -142,10 +118,6 @@ userSchema.methods.generateByToken = function() {
       return err;
     });
 };
-//generate cartvalue
-cartSchema.methods.saveCart = function() {
-  user = this;
-};
 userSchema.statics.findByToken = function(token) {
   let tokenData;
   try {
@@ -156,7 +128,7 @@ userSchema.statics.findByToken = function(token) {
 
   return User.findOne({
     _id: tokenData.user_id,
-    "tokens.token": token //checking form db delete or present
+    "tokens.token": token //chekin form db delete or present
   })
     .then(user => {
       return Promise.resolve(user);

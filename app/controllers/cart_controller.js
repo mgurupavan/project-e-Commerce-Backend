@@ -33,13 +33,13 @@ router.post("/", authentication, (req, res) => {
     }
   });
   if (product) {
-    res.send({ statusText: "you allready added to cart" });
+    res.send({ statusText: "you already added this product to cart" });
   } else {
     user.cart.push(cart);
     user
       .save()
       .then(user => {
-        res.send({ statusText: "Added Sucessfully" });
+        res.send({ statusText: "Added Succesfully" });
       })
       .catch(err => {
         res.status(403).send({
