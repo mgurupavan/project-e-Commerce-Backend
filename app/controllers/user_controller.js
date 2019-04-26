@@ -25,7 +25,7 @@ router.post("/login", (req, res) => {
       //res.send(" successfully logedin ");
     })
     .then(token => {
-      //res.header("x-auth", token).send();
+      //res.header("x-auth", token).send()
       res.send(token);
     })
     .catch(err => {
