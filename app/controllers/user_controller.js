@@ -40,7 +40,7 @@ router.delete("/logout", authentication, (req, res) => {
   )
     .then(user => {
       user.save().then(user => {
-        res.send({ statusText: "suceessfully logout" });
+        res.send({ statusText: "successfully logout" });
       });
     })
     .catch(err => {
@@ -52,7 +52,7 @@ router.delete("/logoutall", authentication, (req, res) => {
   User.findOneAndUpdate({ _id: req.user._id }, { $set: { tokens: [] } })
     .then(user => {
       user.save().then(user => {
-        res.send({ statusText: "succesfully logout from all devices" });
+        res.send({ statusText: "successfully logout from all devices" });
       });
     })
     .catch(err => {
