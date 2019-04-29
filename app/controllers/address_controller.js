@@ -74,7 +74,7 @@ router.delete("/:id", authentication, (req, res) => {
     return address._id != id;
   });
   user.save().then(user => {
-    res.send({ statusText: "succefuuly deleted" });
+    res.send({ statusText: "successfully deleted" });
   });
 });
 module.exports = {

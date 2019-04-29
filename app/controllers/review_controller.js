@@ -33,7 +33,7 @@ router.post("/", authentication, (req, res) => {
   review
     .save()
     .then(review => {
-      res.send({ statusText: "sucessfully review created" });
+      res.send({ statusText: "successfully review created" });
     })
     .catch(err => {
       res.send(err);

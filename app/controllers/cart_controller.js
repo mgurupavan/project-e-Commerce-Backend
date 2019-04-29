@@ -39,7 +39,7 @@ router.post("/", authentication, (req, res) => {
     user
       .save()
       .then(user => {
-        res.send({ statusText: "Added Succesfully" });
+        res.send({ statusText: "Added Successfully" });
       })
       .catch(err => {
         res.status(403).send({
@@ -62,7 +62,7 @@ router.put("/:id", authentication, (req, res) => {
   user
     .save()
     .then(user => {
-      res.send({ statusText: "succesfully Updated" });
+      res.send({ statusText: "successfully Updated" });
     })
     .catch(err => {
       res.send(err);
@@ -75,7 +75,7 @@ router.delete("/:id", authentication, (req, res) => {
     return cart._id != id;
   });
   user.save().then(user => {
-    res.send({ statusText: "succesfully deleted" });
+    res.send({ statusText: "successfully deleted" });
   });
 });
 module.exports = {
